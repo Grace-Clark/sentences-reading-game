@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentence Reading Game</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main id="app">
+  <!-- Title screen -->
+  <section id="screen-title" class="screen active">
+    <h1>Sentence Reading Game</h1>
+    <button class="ghost" id="title-hear">🔊 Hear instructions</button>
+
+    <div class="caregiver-box">
+      <h2 class="caregiver-heading">Instructions for caregivers</h2>
+      <p>This is a reading test for your child. <strong>Please don't help them</strong> — we want to see what they know on their own.</p>
+      <p>After each response, click <strong>"Next"</strong> to continue.</p>
+    </div>
+
+    <button class="primary" id="btn-start">Start</button>
+    <p class="hint">15 questions • 2 practice items first</p>
+  </section>
+
+  <!-- Practice -->
+  <section id="screen-practice" class="screen">
+    <header class="qhead">
+      <span class="qcount" id="pr-count"></span>
+      <span class="qscore">Practice</span>
+    </header>
+    <h2 class="prompt">Listen, then point to the picture.</h2>
+    <button class="ghost" id="pr-hear">🔊 Hear again</button>
+    <div class="practice-grid" id="pr-options"></div>
+    <button class="primary hidden" id="pr-next">Next →</button>
+  </section>
+
+  <!-- Step 1: audio-only — 6 pictures, no printed phrase -->
+  <section id="screen-listen" class="screen">
+    <header class="qhead">
+      <span class="qcount" id="ls-count"></span>
+      <span class="qscore" id="ls-score"></span>
+    </header>
+    <h2 class="prompt">Listen to the pictures. Tap each one to hear it, or hear them all.</h2>
+    <button class="ghost" id="ls-hear-all">🔊 Hear all the pictures</button>
+    <div class="hex-grid" id="ls-options"></div>
+    <button class="primary" id="ls-next">Next →</button>
+  </section>
+
+  <!-- Step 2: phrase only — no pictures -->
+  <section id="screen-phrase" class="screen">
+    <header class="qhead">
+      <span class="qcount" id="ph-count"></span>
+      <span class="qscore" id="ph-score"></span>
+    </header>
+    <h2 class="prompt">Read this sentence:</h2>
+    <div class="target-sentence" id="ph-target"></div>
+    <button class="primary" id="ph-next">Next →</button>
+  </section>
+
+  <!-- Step 3: 6 pictures + printed phrase — student picks -->
+  <section id="screen-choose" class="screen">
+    <header class="qhead">
+      <span class="qcount" id="ch-count"></span>
+      <span class="qscore" id="ch-score"></span>
+    </header>
+    <h2 class="prompt">Pick the picture that matches:</h2>
+    <div class="target-sentence" id="ch-target"></div>
+    <button class="ghost" id="ch-hear-all">🔊 Hear all the pictures</button>
+    <div class="hex-grid" id="ch-options"></div>
+    <button class="primary hidden" id="ch-next">Next →</button>
+  </section>
+
+  <!-- Done screen -->
+  <section id="screen-done" class="screen">
+    <h1 id="done-headline">You did it!</h1>
+    <div class="final-score" id="final-score"></div>
+    <p id="done-detail" class="lede"></p>
+    <div id="report" class="report"></div>
+    <button class="primary" id="btn-restart">Play again</button>
+  </section>
+</main>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
