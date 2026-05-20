@@ -198,7 +198,15 @@
       showPicture(inner, opt.image);
       card.appendChild(inner);
       card.addEventListener("click", () => {
-        playWord(opt.audio || opt.word, prettify(opt.word));
+        // Clear any prior highlight so a rapid second click doesn't leave the
+        // previous card stuck in the speaking state.
+        document
+          .querySelectorAll("#ls-options .speaking")
+          .forEach((c) => c.classList.remove("speaking"));
+        card.classList.add("speaking");
+        playWord(opt.audio || opt.word, prettify(opt.word)).finally(() => {
+          card.classList.remove("speaking");
+        });
         card.classList.add("visited");
         state.visited.add(opt.word);
         if (state.visited.size === q.options.length) nextBtn.disabled = false;
