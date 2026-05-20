@@ -189,12 +189,9 @@
       grid.appendChild(card);
     });
 
-    if (firstQuestion) {
-      setTimeout(
-        () => speak("Listen to the pictures. Then read the sentence. Pick the picture that matches the sentence."),
-        300
-      );
-    }
+    // Auto-play the step-1 direction (also visible on screen) on every question
+    // so the student is reminded what to do each time.
+    setTimeout(() => speak("Click each picture to listen. Click next when you're ready."), 300);
   }
 
   // Step 2 — sentence only
@@ -204,6 +201,7 @@
     $("ph-count").textContent = `Question ${state.mainIndex + 1} of ${QUESTIONS.main.length}`;
     $("ph-score").textContent = `Score: ${state.score}/${state.answered}`;
     $("ph-target").textContent = q.targetSentence;
+    setTimeout(() => speak("Read this sentence. Click next when you're ready."), 300);
   }
 
   // Step 3 — 6 pictures + sentence, student picks
@@ -214,6 +212,7 @@
     $("ch-score").textContent = `Score: ${state.score}/${state.answered}`;
     $("ch-target").textContent = q.targetSentence;
     $("ch-next").classList.add("hidden");
+    setTimeout(() => speak("Click the picture that matches the sentence."), 300);
 
     const grid = $("ch-options");
     grid.innerHTML = "";
@@ -255,8 +254,10 @@
       if (correctCard) correctCard.classList.add("correct");
     }
 
+    // Use the audio-override name for spoken feedback so it matches what the
+    // student just heard (e.g. "bug on rug" instead of "bug on a rug").
     const targetSentence = q.targetSentence;
-    const chosenPretty = prettify(opt.word);
+    const chosenPretty = prettify(opt.audio || opt.word);
     speak(isCorrect ? `Yes! ${targetSentence}` : `That was ${chosenPretty}. The sentence is ${targetSentence}`);
     $("ch-score").textContent = `Score: ${state.score}/${state.answered}`;
     $("ch-next").classList.remove("hidden");
