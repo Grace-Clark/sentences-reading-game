@@ -254,11 +254,18 @@
       if (correctCard) correctCard.classList.add("correct");
     }
 
-    // Use the audio-override name for spoken feedback so it matches what the
-    // student just heard (e.g. "bug on rug" instead of "bug on a rug").
+    // Feedback uses each option's full sentence form so the student hears a
+    // grammatical sentence, e.g. "That was 'The map is in the mud.'" rather
+    // than "That was 'map in mud.'".
     const targetSentence = q.targetSentence;
-    const chosenPretty = prettify(opt.audio || opt.word);
-    speak(isCorrect ? `Yes! ${targetSentence}` : `That was ${chosenPretty}. The sentence is ${targetSentence}`);
+    const chosenSentence = opt.sentence || prettify(opt.audio || opt.word);
+    const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+    const trim = (s) => s.replace(/\.$/, "");
+    speak(
+      isCorrect
+        ? `Yes! ${targetSentence}`
+        : `That was ${trim(lower(chosenSentence))}. The sentence is ${lower(targetSentence)}`
+    );
     $("ch-score").textContent = `Score: ${state.score}/${state.answered}`;
     $("ch-next").classList.remove("hidden");
   }
@@ -297,12 +304,20 @@
     table.className = "report-table";
     table.innerHTML = "<thead><tr><th>Sentence</th><th>Picked</th></tr></thead><tbody></tbody>";
     const tbody = table.querySelector("tbody");
-    // Build a map from target -> sentence so the report shows the printed sentence.
+    // Build lookups: target -> sentence (correct answer) and word -> sentence
+    // (any option). Used to render the full sentence for both columns.
     const sentenceByTarget = Object.fromEntries(QUESTIONS.main.map((q) => [q.target, q.targetSentence]));
+    const sentenceByWord = {};
+    QUESTIONS.main.forEach((q) =>
+      q.options.forEach((o) => {
+        sentenceByWord[o.word] = o.sentence || prettify(o.word);
+      })
+    );
     missed.forEach((a) => {
       const tr = document.createElement("tr");
-      const sentence = sentenceByTarget[a.target] || prettify(a.target);
-      tr.innerHTML = `<td class="report-word">${sentence}</td><td class="report-word report-wrong">${prettify(a.chosen)}</td>`;
+      const correct = sentenceByTarget[a.target] || prettify(a.target);
+      const chosen  = sentenceByWord[a.chosen]  || prettify(a.chosen);
+      tr.innerHTML = `<td class="report-word">${correct}</td><td class="report-word report-wrong">${chosen}</td>`;
       tbody.appendChild(tr);
     });
     reportEl.appendChild(table);
@@ -317,7 +332,7 @@
         `Date: ${new Date().toLocaleString()}`,
         "",
         "Missed trials:",
-        ...missed.map((a) => `  sentence: ${sentenceByTarget[a.target] || prettify(a.target)} — picked: ${prettify(a.chosen)}`),
+        ...missed.map((a) => `  sentence: ${sentenceByTarget[a.target] || prettify(a.target)} — picked: ${sentenceByWord[a.chosen] || prettify(a.chosen)}`),
       ];
       const text = lines.join("\n");
       try {
