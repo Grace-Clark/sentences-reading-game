@@ -70,12 +70,35 @@
 
   // Try a recorded audio file from assets/audio/<word>.mp3 first; fall back to TTS.
   const audioCache = new Map();
+  let audioWarmed = false;
+
+  // Plays a tiny silent WAV inside the user gesture so Chrome's autoplay
+  // policy lets subsequent Audio.play() calls through.
+  function warmupAudio() {
+    if (audioWarmed) return;
+    audioWarmed = true;
+    try {
+      const silent = new Audio(
+        "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
+      );
+      silent.volume = 0;
+      const p = silent.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch (e) { /* ignore */ }
+  }
+
   function tryPlayUrl(url) {
     return new Promise((resolve, reject) => {
       const audio = new Audio(url);
       audio.addEventListener("ended", () => resolve(true));
-      audio.addEventListener("error", () => reject());
-      audio.play().then(() => { currentAudio = audio; }).catch(reject);
+      audio.addEventListener("error", () => {
+        console.warn("[audio error]", url, audio.error && audio.error.code);
+        reject();
+      });
+      audio.play().then(() => { currentAudio = audio; }).catch((e) => {
+        console.warn("[audio play rejected]", url, e && e.message);
+        reject(e);
+      });
     });
   }
   async function playWord(word, ttsText, ttsOpts) {
@@ -407,6 +430,8 @@
     state.answered = 0;
     state.answers = [];
     shuffle(QUESTIONS.main);
+    // Unlock audio for Chrome's autoplay policy.
+    warmupAudio();
     if (synth) {
       const u = new SpeechSynthesisUtterance(" ");
       synth.speak(u);
@@ -415,6 +440,7 @@
   });
 
   $("title-hear").addEventListener("click", () => {
+    warmupAudio();
     (async () => {
       const lines = [
         "Sentence Reading Game.",
