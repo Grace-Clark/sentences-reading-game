@@ -178,11 +178,14 @@
       card.className = "option hex-option";
       card.type = "button";
       card.dataset.word = opt.word;
+      // opt.audio is an optional override for the audio filename base — used
+      // when the recording's filename doesn't match the option's word.
+      card.dataset.audio = opt.audio || opt.word;
       const inner = document.createElement("div");
       inner.className = "crop";
       showPicture(inner, opt.image);
       card.appendChild(inner);
-      card.addEventListener("click", () => playWord(opt.word, prettify(opt.word)));
+      card.addEventListener("click", () => playWord(opt.audio || opt.word, prettify(opt.word)));
       grid.appendChild(card);
     });
 
@@ -224,6 +227,7 @@
       card.className = "option hex-option";
       card.type = "button";
       card.dataset.word = opt.word;
+      card.dataset.audio = opt.audio || opt.word;
       const inner = document.createElement("div");
       inner.className = "crop";
       showPicture(inner, opt.image);
@@ -383,7 +387,8 @@
     const cards = document.querySelectorAll("#ls-options .option");
     for (const c of cards) {
       const w = c.dataset.word;
-      await playWord(w, prettify(w));
+      const audioKey = c.dataset.audio || w;
+      await playWord(audioKey, prettify(w));
       await new Promise((r) => setTimeout(r, 250));
     }
   });
@@ -403,7 +408,8 @@
     const cards = document.querySelectorAll("#ch-options .option");
     for (const c of cards) {
       const w = c.dataset.word;
-      await playWord(w, prettify(w));
+      const audioKey = c.dataset.audio || w;
+      await playWord(audioKey, prettify(w));
       await new Promise((r) => setTimeout(r, 250));
     }
   });
