@@ -210,7 +210,30 @@ button:active { transform: scale(0.97); }
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: border-color 0.15s, transform 0.05s;
+  position: relative;
 }
+
+/* Small replay-audio button overlay shown on each card in step 3 so the
+   student can hear the picture without picking it as their answer. */
+.option-speaker {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 15px;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  z-index: 3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.option-speaker:hover { background: #eff6ff; }
 .option:hover:not(.locked) { border-color: var(--accent); }
 .option:active:not(.locked) { transform: scale(0.98); }
 .option.correct { border-color: var(--good); background: var(--good-soft); }

@@ -255,6 +255,25 @@
       inner.className = "crop";
       showPicture(inner, opt.image);
       card.appendChild(inner);
+      // Small speaker overlay so the student can replay the picture's audio
+      // without picking it as the answer.
+      const sp = document.createElement("span");
+      sp.className = "option-speaker";
+      sp.textContent = "🔊";
+      sp.setAttribute("role", "button");
+      sp.setAttribute("tabindex", "0");
+      sp.setAttribute("aria-label", `Hear ${prettify(opt.word)}`);
+      sp.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document
+          .querySelectorAll("#ch-options .speaking")
+          .forEach((c) => c.classList.remove("speaking"));
+        card.classList.add("speaking");
+        playWord(opt.audio || opt.word, prettify(opt.word)).finally(() => {
+          card.classList.remove("speaking");
+        });
+      });
+      card.appendChild(sp);
       card.addEventListener("click", () => handleChoosePick(card, opt, q));
       grid.appendChild(card);
     });
