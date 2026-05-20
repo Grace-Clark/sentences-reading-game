@@ -1,6 +1,14 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
+  // Directions shown at the top of each step. Each is auto-played via TTS when
+  // the step is entered, and the "Hear directions again" button replays it.
+  const DIRECTIONS = {
+    listen: "Click each picture. Then press next!",
+    phrase: "Read this sentence. Then press next!",
+    choose: "Pick the picture that matches the sentence. Then press next!",
+  };
+
   const state = {
     prIndex: 0,
     mainIndex: 0,
@@ -9,6 +17,7 @@
     answered: 0,
     total: QUESTIONS.main.length,
     answers: [], // { target, chosen, correct }
+    visited: new Set(), // word ids the student has clicked on step 1 of the current question
   };
 
   // ---------- Audio (Web Speech + recorded files in assets/audio/) ----------
@@ -163,16 +172,19 @@
 
   // Step 1 — 6 pictures, audio-only
   function renderListen() {
-    const firstQuestion = state.mainIndex === 0;
     showScreen("screen-listen");
     const q = QUESTIONS.main[state.mainIndex];
     $("ls-count").textContent = `Question ${state.mainIndex + 1} of ${QUESTIONS.main.length}`;
     $("ls-score").textContent = `Score: ${state.score}/${state.answered}`;
 
+    state.visited = new Set();
+    const nextBtn = $("ls-next");
+    nextBtn.disabled = true;
+
     const grid = $("ls-options");
     grid.innerHTML = "";
     const shuffled = shuffle(q.options.slice());
-    state.currentOrder = shuffled.map((o) => o.word); // remember order to reuse on choose screen
+    state.currentOrder = shuffled.map((o) => o.word); // reuse order on the choose screen
     shuffled.forEach((opt) => {
       const card = document.createElement("button");
       card.className = "option hex-option";
@@ -185,13 +197,17 @@
       inner.className = "crop";
       showPicture(inner, opt.image);
       card.appendChild(inner);
-      card.addEventListener("click", () => playWord(opt.audio || opt.word, prettify(opt.word)));
+      card.addEventListener("click", () => {
+        playWord(opt.audio || opt.word, prettify(opt.word));
+        card.classList.add("visited");
+        state.visited.add(opt.word);
+        if (state.visited.size === q.options.length) nextBtn.disabled = false;
+      });
       grid.appendChild(card);
     });
 
-    // Auto-play the step-1 direction (also visible on screen) on every question
-    // so the student is reminded what to do each time.
-    setTimeout(() => speak("Click each picture to listen. Click next when you're ready."), 300);
+    // Auto-play the step-1 direction on every question.
+    setTimeout(() => speak(DIRECTIONS.listen), 300);
   }
 
   // Step 2 — sentence only
@@ -201,7 +217,7 @@
     $("ph-count").textContent = `Question ${state.mainIndex + 1} of ${QUESTIONS.main.length}`;
     $("ph-score").textContent = `Score: ${state.score}/${state.answered}`;
     $("ph-target").textContent = q.targetSentence;
-    setTimeout(() => speak("Read this sentence. Click next when you're ready."), 300);
+    setTimeout(() => speak(DIRECTIONS.phrase), 300);
   }
 
   // Step 3 — 6 pictures + sentence, student picks
@@ -212,7 +228,7 @@
     $("ch-score").textContent = `Score: ${state.score}/${state.answered}`;
     $("ch-target").textContent = q.targetSentence;
     $("ch-next").classList.add("hidden");
-    setTimeout(() => speak("Click the picture that matches the sentence."), 300);
+    setTimeout(() => speak(DIRECTIONS.choose), 300);
 
     const grid = $("ch-options");
     grid.innerHTML = "";
@@ -399,36 +415,21 @@
     state.step = "phrase";
     renderMain();
   });
-  $("ls-hear-all").addEventListener("click", async () => {
-    const cards = document.querySelectorAll("#ls-options .option");
-    for (const c of cards) {
-      const w = c.dataset.word;
-      const audioKey = c.dataset.audio || w;
-      await playWord(audioKey, prettify(w));
-      await new Promise((r) => setTimeout(r, 250));
-    }
-  });
-
   $("ph-next").addEventListener("click", () => {
     state.step = "choose";
     renderMain();
   });
-
   $("ch-next").addEventListener("click", () => {
     state.mainIndex += 1;
     state.step = "listen";
     state.currentOrder = null;
     renderMain();
   });
-  $("ch-hear-all").addEventListener("click", async () => {
-    const cards = document.querySelectorAll("#ch-options .option");
-    for (const c of cards) {
-      const w = c.dataset.word;
-      const audioKey = c.dataset.audio || w;
-      await playWord(audioKey, prettify(w));
-      await new Promise((r) => setTimeout(r, 250));
-    }
-  });
+
+  // Replay the per-step direction.
+  $("ls-hear-direction").addEventListener("click", () => speak(DIRECTIONS.listen));
+  $("ph-hear-direction").addEventListener("click", () => speak(DIRECTIONS.phrase));
+  $("ch-hear-direction").addEventListener("click", () => speak(DIRECTIONS.choose));
 
   $("btn-restart").addEventListener("click", () => {
     showScreen("screen-title");
