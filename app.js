@@ -359,7 +359,7 @@
     (async () => {
       const lines = [
         "Sentence Reading Game.",
-        "Instructions for caregivers.",
+        "Instructions for care givers.",
         "This is a reading test for your child. Please don't help them. We want to see what they know on their own.",
         "After each response, click Next to continue to the next question.",
       ];
