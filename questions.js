@@ -209,16 +209,15 @@ const QUESTIONS = {
       ]
     },
     {
-      // No recordings yet for the mop question — all 6 options fall back to TTS.
       targetSentence: "The mop is in the mud.",
       target: "the_mop_is_in_the_mud",
       options: [
-        { word: "the_mop_is_in_the_mud",    image: "the_mop_is_in_the_mud.png" },
-        { word: "the_mop_is_in_the_spud",   image: "the_mop_is_in_the_spud.png" },
-        { word: "the_mop_is_above_the_mud", image: "the_mop_is_above_the_mud.png" },
-        { word: "the_mom_is_in_the_mud",    image: "the_mom_is_in_the_mud.png" },
-        { word: "the_map_is_in_the_mud",    image: "the_map_is_in_the_mud.png" },
-        { word: "the_mop_is_in_the_mug",    image: "the_mop_is_in_the_mug.png" }
+        { word: "the_mop_is_in_the_mud",    image: "the_mop_is_in_the_mud.png",    audio: "mop_in_mud" },
+        { word: "the_mop_is_in_the_spud",   image: "the_mop_is_in_the_spud.png",   audio: "mop_in_spud" },
+        { word: "the_mop_is_above_the_mud", image: "the_mop_is_above_the_mud.png", audio: "mop_above_mud" },
+        { word: "the_mom_is_in_the_mud",    image: "the_mom_is_in_the_mud.png",    audio: "mom_in_mud" },
+        { word: "the_map_is_in_the_mud",    image: "the_map_is_in_the_mud.png",    audio: "map_in_mud" },
+        { word: "the_mop_is_in_the_mug",    image: "the_mop_is_in_the_mug.png",    audio: "mop_in_mug" }
       ]
     }
   ]
